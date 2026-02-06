@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>China Travel Guide: Digital Mobility</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 0. 全局重置 (新增：解决宽度不一致的核心代码) --- */
+        * {
+            box-sizing: border-box;
+        }
+
+        /* --- 1. 全局与基础样式 --- */
+        :root {
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-light: #666;
+            --accent-orange: #ff5200; 
+            --accent-green: #00b894; 
+            --accent-blue: #1677ff; 
+            --mockup-width: 320px; 
+            --mockup-height: 640px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* --- 顶部导航栏 (方案一：动态下划线) --- */
+        .top-nav a {
+            text-decoration: none;
+            color: #57606f;
+            margin-left: 30px;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+            position: relative;
+            padding-bottom: 5px;
+        }
+
+        /* 鼠标悬停时的文字颜色 */
+       .top-nav a:hover {
+           color: var(--accent-blue); 
+         }
+
+        /* 创建下划线 */
+       .top-nav a::after {
+          content: '';
+          position: absolute;
+          width: 0; /* 默认宽度为0，看不见 */
+          height: 2px;
+          bottom: 0;
+          left: 50%; /* 从中间开始 */
+          background-color: var(--accent-blue);
+          transition: all 0.3s ease-in-out;
+         transform: translateX(-50%); /* 修正中心点 */
+         }
+
+        /* 鼠标悬停时，下划线展开 */
+        .top-nav a:hover::after {
+           width: 100%;
+        }
+
+        /* 统一的板块标题样式 */
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-top: 40px;
+        }
+        
+        .section-tag {
+            color: var(--accent-blue);
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        h1 { margin: 0 0 15px 0; font-size: 2.5rem; line-height: 1.2; }
+        
+        .subtitle { 
+            color: #7f8c8d;
+            font-size: 1.1rem; 
+            max-width: 600px; 
+            margin: 0 auto; 
+        }
+
+        /* --- 2. 步骤卡片布局 --- */
+        .step-section {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 50px;
+            margin-bottom: 60px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            /* 确保边框不会溢出 */
+            width: 100%; 
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* 增加过渡动画 */
+        }
+        .step-section:hover {
+          /* 微微上浮 2px，不要太多，否则会晕 */
+          transform: translateY(-2px); 
+          /* 阴影变得更深、更虚，营造悬浮感 */
+          box-shadow: 0 20px 40px rgba(0,0,0,0.08); 
+}
+
+        .didi-step .step-header { border-left-color: var(--accent-orange); }
+        .metro-step .step-header { border-left-color: var(--accent-blue); }
+
+        .step-header {
+            margin-bottom: 30px;
+            border-left: 5px solid #ccc;
+            padding-left: 20px;
+        }
+
+        .step-header h2 { margin: 0; font-size: 1.8rem; }
+        .step-header p { margin: 10px 0 0 0; color: #666; font-size: 1.1rem; }
+
+        .visual-area {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 50px;
+        }
+
+        .text-area {
+            flex: 1;
+            min-width: 300px;
+            padding-top: 10px;
+        }
+
+        .text-area h3 { margin-top: 0; color: var(--text-main); }
+
+        /* --- 3. 手机样机 (Phone Mockup) --- */
+        .phone-mockup {
+            width: var(--mockup-width);
+            height: var(--mockup-height);
+            background: #000;
+            border-radius: 40px;
+            border: 12px solid #333;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+            image-rendering: -webkit-optimize-contrast; 
+        }
+
+        .phone-mockup img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center;
+        }
+
+        /* --- 4. 动态圈圈 --- */
+        .click-target {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--accent-blue); 
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(22, 119, 255, 0.6);
+            transform: translate(-50%, -50%);
+            pointer-events: none; 
+            animation: pulse 2s infinite;
+            z-index: 10;
+        }
+
+        .click-target::after {
+            content: '👆';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.5; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        /* --- 5. CSS 绘制的卡通界面 --- */
+        .css-drawing-container {
+            width: 100%;
+            height: 100%;
+            background: #eef2f5;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mock-map {
+            flex: 1;
+            background-image: 
+                linear-gradient(#d9d9d9 2px, transparent 2px),
+                linear-gradient(90deg, #d9d9d9 2px, transparent 2px);
+            background-size: 40px 40px; 
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .car-icon { font-size: 50px; animation: drive 3s infinite ease-in-out; }
+        @keyframes drive {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
+        }
+
+        .driver-card-ui {
+            background: white;
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+        }
+
+        .driver-info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .time-badge { background: #333; color: #fff; padding: 5px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: bold; }
+        .car-detail { font-size: 1.1rem; color: #333; font-weight: bold; }
+
+        .plate-number-box {
+            background: #f0f9ff;
+            border: 2px solid #2980b9;
+            color: #2980b9;
+            font-size: 1.8rem; 
+            font-weight: 800;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            letter-spacing: 2px;
+        }
+
+        /* --- 6. 提示框样式 --- */
+        .price-alert {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px; border-radius: 10px; margin-top: 20px;
+            display: inline-block; font-weight: bold;
+        }
+
+        .pro-tip-box {
+            background: #e6fffa;
+            border-left: 5px solid var(--accent-green);
+            padding: 15px; border-radius: 8px; margin-top: 20px;
+            color: #2d3436; font-size: 0.95rem;
+        }
+
+        .payment-tip-box {
+            background: #f0f7fb;
+            border-left: 5px solid var(--accent-blue);
+            padding: 15px; border-radius: 8px; margin-top: 20px;
+            color: #2c3e50; font-size: 0.95rem;
+        }
+        
+        .simple-note-box {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #888;
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .tip-title { font-weight: bold; display: block; margin-bottom: 5px; }
+        
+        @keyframes scan {
+            0% { top: 20%; opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { top: 60%; opacity: 0; }
+        }
+
+        /* --- 7. Part 3: 照片墙样式 (瀑布流) --- */
+        .gallery-grid {
+            column-count: 3;
+            column-gap: 25px;
+            padding: 20px 0;
+        }
+
+        .photo-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            break-inside: avoid; 
+            margin-bottom: 25px;
+            backface-visibility: hidden;
+        }
+
+        .photo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        .photo-frame {
+            width: 100%;
+            height: auto; 
+            background-color: #eee;
+            position: relative;
+            line-height: 0; 
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: auto; 
+            display: block;
+        }
+
+        .photo-caption { padding: 20px; }
+
+        .photo-location {
+            color: var(--accent-blue);
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+            letter-spacing: 1px;
+        }
+
+        .photo-desc {
+            font-size: 0.95rem;
+            color: var(--text-main);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* --- 8. 响应式适配 (优化版) --- */
+        @media (max-width: 900px) {
+            .gallery-grid { column-count: 2; }
+        }
+
+        @media (max-width: 600px) {
+            .gallery-grid { column-count: 1; }
+            .step-section { padding: 30px 20px; }
+            
+            /* 优化点：限制移动端样机宽度，防止过大 */
+            :root { 
+                --mockup-width: 280px; 
+                --mockup-height: auto; 
+                aspect-ratio: 9/18;
+            }
+            
+            .visual-area { flex-direction: column; align-items: center; }
+            .top-nav { justify-content: center; } 
+            
+            /* 优化点：减小移动端标题字号 */
+            h1 { font-size: 1.8rem; }
+            .hero-title { font-size: 2rem; }
+        }
+        
+        /* --- 9. Part 1: 首页导航封面 --- */
+        .hero-section {
+            text-align: center;
+            padding: 60px 20px 40px;
+            margin-bottom: 40px;
+        }
+        
+        .hero-title {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        /* --- 10. 表格样式优化 --- */
+        .suica-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.95rem; min-width: 500px; /* 确保表格不被挤压 */ }
+        .suica-table th { text-align: left; padding: 12px; background: #f9f9f9; border-bottom: 2px solid #ddd; }
+        .suica-table td { padding: 12px; border-bottom: 1px solid #eee; }
+        .tag-green { background: #e6fffa; color: #009432; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
+        .tag-red { background: #fff0f0; color: #c0392b; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <nav class="top-nav">
+        <a href="#gallery-part">Gallery</a>
+        <a href="#china-part">China Guide</a>
+        <a href="#japan-part">Japan Guide</a>
+        <a href="https://kiryuyu7227-maker.github.io/portfolio/" target="_blank">About me</a>
+
+    </nav>
+
+    <div class="hero-section">
+        <h1 class="hero-title">My Asia Travel Log</h1>
+        <p class="subtitle">A guide to digital mobility & captured memories.</p>
+    </div>
+
+    <div style="margin: 60px 0; border-top: 1px solid #eee;"></div>
+
+    <div class="section-header" id="gallery-part">
+        <span class="section-tag" style="color: #9b59b6;">Memories</span>
+        <h1>Travel Gallery</h1>
+        <p class="subtitle">Capturing the moments from the streets of Shanghai and Tokyo.</p>
+    </div>
+
+    <div class="gallery-grid">
+        <div class="photo-card">
+            <div class="photo-frame">
+                <img src="Shanghai01.PNG" alt="Shanghai Skyline" loading="lazy">
+            </div>
+            <div class="photo-caption">
+                <span class="photo-location">📍 Shanghai, The Bund</span>
+                <p class="photo-desc">The cyberpunk aesthetic of Lujiazui at night. Analyzing the height of the Oriental Pearl Tower.</p>
+            </div>
+        </div>
+
+        <div class="photo-card">
+            <div class="photo-frame">
+                <img src="Japan01.PNG" alt="Tokyo Tower" loading="lazy">
+            </div>
+            <div class="photo-caption">
+                <span class="photo-location">📍 Tokyo, Minato</span>
+                <p class="photo-desc">Golden hour descent into Haneda. A perfect, wing-free view of Tokyo Tower from Seat A.</p>
+            </div>
+        </div>
+
+        <div class="photo-card">
+            <div class="photo-frame">
+                <img src="Japan02.PNG" alt="Senso-Ji Pagoda" loading="lazy">
+            </div>
+            <div class="photo-caption">
+                <span class="photo-location">📍 Tokyo, Asakusa</span>
+                <p class="photo-desc">Senso-Ji Five-Story Pagoda. A beautiful study of traditional wooden construction.</p>
+            </div>
+        </div>
+
+        <div class="photo-card">
+            <div class="photo-frame">
+                <img src="Japan03.PNG" alt="Yokohama Ferris Wheel" loading="lazy">
+            </div>
+            <div class="photo-caption">
+                <span class="photo-location">📍 Yokohama, Cosmo World</span>
+                <p class="photo-desc">My favorite area in Japan, Sakuragicho, Yokohama.</p>
+            </div>
+        </div>
+
+        <div class="photo-card">
+            <div class="photo-frame">
+                <img src="Shanghai02.PNG" alt="Xiaomi SU7" loading="lazy">
+            </div>
+            <div class="photo-caption">
+                <span class="photo-location">📍 Shanghai, Showroom</span>
+                <p class="photo-desc">Checking out the local EV market. The Xiaomi SU7 design language is sleek.</p>
+            </div>
+        </div>
+
+        <div class="photo-card">
+            <div class="photo-frame">
+                <img src="Shanghai03.PNG" alt="Pop Mart Collection" loading="lazy">
+            </div>
+            <div class="photo-caption">
+                <span class="photo-location">📍 Shanghai, Pop Mart</span>
+                <p class="photo-desc">The blind box craze! Secured the "Year of the Horse" Limited Edition Molly and Skullpanda series.</p>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin: 60px 0; border-top: 1px solid #eee;"></div>
+
+    <div class="section-header" id="china-part">
+        <span class="section-tag">CHINA GUIDE • PART 1</span>
+        <h1>Ride-hailing (DiDi)</h1>
+        <p class="subtitle">Navigate the city like a local using the "Uber" of China, directly inside Alipay.</p>
+    </div>
+
+    <div class="step-section didi-step">
+        <div class="step-header">
+            <h2>Step 1: Open DiDi Travel</h2>
+            <p>Find the "DiDi Travel" icon on the Alipay homepage.</p>
+        </div>
+        <div class="visual-area">
+            <div class="phone-mockup">
+                <img src="Alipay_Homepatge.jpg" alt="Alipay Home">
+                <div class="click-target" style="top: 38%; left: 71%;"></div>
+            </div>
+            <div class="text-area">
+                <h3>One-click Access</h3>
+                <p>Alipay is a "Super App". DiDi is built right inside it, so you don't need to download a separate app.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="step-section didi-step" style="border: 2px dashed #ccc; background: #fafafa;">
+        <div class="step-header">
+            <h2>⚠️ Troubleshooting: Can't find the icon?</h2>
+            <p>If the icon isn't there, follow these 3 steps: Click "More" -> Search -> Select.</p>
+        </div>
+        <div class="visual-area">
+            <div class="phone-mockup">
+                <img src="DiDi_1.jpg" alt="Click More">
+                <div class="click-target" style="top: 48%; left: 88%;"></div>
+            </div>
+
+            <div class="phone-mockup">
+                <img src="DiDi_2.jpg" alt="More Services">
+                <div class="click-target" style="top: 5%; left: 84%;"></div>
+            </div>
+
+            <div class="phone-mockup">
+                <img src="DiDi_3.jpg" alt="Search Result">
+                <div class="click-target" style="top: 12%; left: 50%; width: 90%; height: 60px; border-radius: 10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="step-section didi-step">
+        <div class="step-header">
+            <h2>Step 2: Enter Destination</h2>
+            <p>The app auto-locates you. Just tap "Where to?" and type in English.</p>
+        </div>
+        <div class="visual-area">
+            <div class="phone-mockup">
+                <img src="DiDi_4.jpg" alt="Map">
+                <div class="click-target" style="top: 45%; left: 50%; width: 80%; border-radius: 10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="step-section didi-step">
+        <div class="step-header">
+            <h2>Step 3: Confirm Location</h2>
+            <p>Double check the drop-off point, then click the orange button.</p>
+        </div>
+        <div class="visual-area">
+            <div class="phone-mockup">
+                <img src="DiDi_5.jpg" alt="Confirm Dest">
+                <div class="click-target" style="top: 94%; left: 50%; width: 90%; border-radius: 30px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="step-section didi-step">
+        <div class="step-header">
+            <h2>Step 4: Request Ride</h2>
+            <p>Choose your car type and hit confirm.</p>
+            <div class="price-alert">
+                💰 Price Note: The screenshot shows ~200 CNY because it's a very long trip. Normal city rides are much cheaper (20-50 CNY).
+            </div>
+        </div>
+        <div class="visual-area">
+            <div class="phone-mockup">
+                <img src="DiDi_6.jpg" alt="Select Car">
+                <div class="click-target" style="top: 93%; left: 79%; width: 40%; border-radius: 30px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="step-section didi-step">
+        <div class="step-header">
+            <h2>Step 5: Waiting & Payment</h2>
+            <p>Identify your car, verify identity, and enjoy the ride.</p>
+        </div>
+        
+        <div class="visual-area">
+            <div class="phone-mockup">
+                <div class="css-drawing-container">
+                    <div class="mock-map">
+                        <div class="car-icon">🚖</div>
+                        <div style="position:absolute; top:30%; background:white; padding:5px 10px; border-radius:15px; font-size:0.8rem; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+                            Arriving in 3 min
+                        </div>
+                    </div>
+                    
+                    <div class="driver-card-ui">
+                        <div class="driver-info-row">
+                            <span class="car-detail">Toyota Camry · White</span>
+                            <span class="time-badge">0.8 km</span>
+                        </div>
+                        <div style="font-size:0.9rem; color:#666; margin-bottom:5px;">Look for this Plate Number:</div>
+                        <div class="plate-number-box">沪A·88888</div>
+                        <div class="driver-info-row" style="margin-top:15px; border-top:1px solid #eee; padding-top:15px;">
+                            <span style="font-weight:bold;">Driver: Master Wang</span>
+                            <span>⭐ 5.0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="click-target" style="top: 80%; left: 50%; width: 90%; height: 70px; border-radius: 10px;"></div>
+            </div>
+            
+            <div class="text-area">
+                <h3>🚕 Spotting Your Ride</h3>
+                <p>Check the <strong>License Plate Number</strong> (in the box) to find your car.</p>
+                
+                <div class="pro-tip-box">
+                    <span class="tip-title" style="color:var(--accent-green);">🌟 No Local Number Needed</span>
+                    Because you are using DiDi inside Alipay, <strong>it automatically uses the international phone number linked to your Alipay account.</strong> <br>
+                    Just tell the driver the last 4 digits of <em>your own</em> number!
+                </div>
+
+                <div class="payment-tip-box">
+                    <span class="tip-title" style="color:var(--accent-blue);">💳 Automatic Payment</span>
+                    <strong>No action needed after the ride!</strong><br>
+                    Alipay will automatically deduct the fare from your linked card. Just leave when you arrive.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin: 100px 0 0 0; border-top: 1px solid #eee;"></div>
+
+    <div class="section-header">
+        <span class="section-tag">CHINA GUIDE • PART 2</span>
+        <h1>Subway & Bus</h1>
+        <p class="subtitle">Forget buying tickets. With Alipay, your phone is your pass for public transport in almost every Chinese city.</p>
+    </div>
+
+    <div class="step-section metro-step">
+        <div class="step-header">
+            <h2>Step 1: Select Transport</h2>
+            <p>On the Homepage, click the "Transport" icon.</p>
+        </div>
+        <div class="visual-area">
+            <div class="phone-mockup">
+                <img src="Metro_1.jpg" alt="Alipay Home">
+                <div class="click-target" style="top: 11%; left: 62%;"></div>
+            </div>
+            <div class="text-area">
+                <h3>One Code for All</h3>
+                <p>This section holds the QR codes for Metro (Subway) and Bus.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="step-section metro-step">
+        <div class="step-header">
+            <h2>Step 2: Check Your City</h2>
+            <p>Alipay usually auto-detects your location. If not, switch it manually.</p>
+        </div>
+        <div class="visual-area">
+            <div class="phone-mockup">
+                <img src="Metro_2.jpg" alt="Transport Page">
+                <div class="click-target" style="top: 4%; left: 50%; width: 70%; height: 40px; border-radius: 10px;"></div>      
+            </div>
+            <div class="phone-mockup">
+                <img src="Metro_3.jpg" alt="City List">
+                <div class="click-target" style="top: 8%; left: 50%; width: 80%; height: 40px; border-radius: 10px;"></div>
+            </div>
+        </div>
+        <div class="simple-note-box">
+            <strong>Note:</strong> I used "Guangzhou" in screenshots as an example. 
+            If you are in Shanghai, simply select <strong>Shanghai</strong>. The steps are identical.
+        </div>
+    </div>
+
+    <div class="step-section metro-step">
+        <div class="step-header">
+            <h2>Step 3: One-time Setup</h2>
+            <p>If it's your first time in a city, you need to activate the card.</p>
+        </div>
+        <div class="visual-area">
+            <div class="phone-mockup">
+                <img src="Metro_4.jpg" alt="Agree Page">
+                <div class="click-target" style="top: 62%; left: 50%; width: 85%; height: 50px; border-radius: 30px;"></div>
+            </div>
+            <div class="phone-mockup">
+                <img src="Metro_5.jpg" alt="Success Page">
+                <div class="click-target" style="top: 42%; left: 50%; width: 85%; height: 50px; border-radius: 30px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="step-section metro-step">
+        <div class="step-header">
+            <h2>Step 4: Scan & Go</h2>
+            <p>This is your digital ticket. Use it to enter and exit the station.</p>
+        </div>
+        <div class="visual-area">
+            <div class="phone-mockup">
+                <img src="Metro_6.jpg" alt="QR Code">
+                <div style="position:absolute; top:30%; left:15%; width:70%; height:2px; background:red; box-shadow:0 0 10px red; animation: scan 2s infinite;"></div>
+            </div>
+            <div class="text-area">
+                <h3>How to use:</h3>
+                <ul style="padding-left: 20px; color: #555;">
+                    <li style="margin-bottom:10px;">Hold your phone screen about 5cm above the scanner at the gate.</li>
+                    <li style="margin-bottom:10px;">The gate will open instantly.</li>
+                    <li style="margin-bottom:10px;"><strong>Payment:</strong> It will calculate the distance and deduct money automatically when you exit.</li>
+                </ul>
+                
+                <div class="payment-tip-box" style="margin-top:20px;">
+                    <span class="tip-title">⚡ Fast Access</span>
+                    Next time you open "Transport", this QR code will appear immediately. No need to set up again!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin: 100px 0 60px 0; border-top: 1px solid #eee; padding-top: 60px;"></div>
+
+    <div class="section-header" id="japan-part">
+        <span class="section-tag" style="color:#00C03A;">JAPAN GUIDE</span>
+        <h1>Subway & bus (Suica)</h1>
+        <p class="subtitle">One card to rule them all. Trains, buses, and convenience stores.</p>
+    </div>
+
+    <div class="step-section" style="border-left: 5px solid #00C03A;">
+        <div class="step-header" style="border:none; padding:0; margin-bottom:20px;">
+            <h2>Green vs. Red: Which one for you?</h2>
+            <p>Japan offers two main types of digital Suica. I recommend the <strong>Green Suica</strong> for long-term use.</p>
+        </div>
+        
+        <div style="overflow-x: auto;">
+            <table class="suica-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th><span class="tag-green">Green Suica (Standard)</span></th>
+                        <th><span class="tag-red">Red Suica (Welcome)</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Target Audience</strong></td>
+                        <td>Residents / Long-term travelers</td>
+                        <td>Short-term Tourists</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Validity</strong></td>
+                        <td><strong>10 Years</strong> (from last use)</td>
+                        <td>28 Days (Physical) / 180 Days (App)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Refundable?</strong></td>
+                        <td>Yes (Balance is refundable)</td>
+                        <td>No (Use it or lose it)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Platform</strong></td>
+                        <td>iPhone Only*</td>
+                        <td>iPhone Only*</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; margin-top: 20px; display: flex; align-items: flex-start; gap: 10px;">
+            <span style="font-size: 1.2rem;">🤖</span>
+            <div>
+                <strong>Android User?</strong><br>
+                Unfortunately, most Android phones sold outside Japan do not have the required "FeliCa" chip. 
+                Please purchase a <strong>physical Suica card</strong> (Green or Red) at the airport or major stations.
+            </div>
+        </div>
+    </div>
+
+    <div class="step-section">
+        <div class="step-header" style="border-left-color: #00C03A;">
+            <h2>Step 1: Open Wallet</h2>
+            <p>No need to download a separate app. Use the native Apple Wallet.</p>
+        </div>
+        <div class="visual-area">
+            <div class="phone-mockup">
+                <img src="Suica_1.PNG" alt="Apple Wallet">
+                <div class="click-target" style="top: 9%; left: 79%; border-color:#00C03A; box-shadow: 0 0 15px rgba(0, 192, 58, 0.6);"></div>
+            </div>
+            <div class="text-area">
+                <h3>Native Integration</h3>
+                <p>Open the "Wallet" app on your iPhone and tap the <strong>(+)</strong> button at the top right corner.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="step-section">
+        <div class="step-header" style="border-left-color: #00C03A;">
+            <h2>Step 2: Select "Transit Card"</h2>
+            <p>Search for Suica in the global transit list.</p>
+        </div>
+        <div class="visual-area">
+            <div class="phone-mockup">
+                <img src="Suica_2.JPG" alt="Select Type">
+                <div class="click-target" style="top: 62%; left: 50%; width: 90%; height: 50px; border-radius: 10px; border-color:#00C03A; box-shadow: 0 0 15px rgba(0, 192, 58, 0.6);"></div>
+            </div>
+            <div class="phone-mockup">
+                <img src="Suica_3.PNG" alt="Search Suica">
+                <div class="click-target" style="top: 56%; left: 50%; width: 90%; height: 50px; border-radius: 10px; border-color:#00C03A; box-shadow: 0 0 15px rgba(0, 192, 58, 0.6);"></div>
+                <div style="position:absolute; top:30%; width:100%; text-align:center; color:#d93025; font-size:0.8rem;">
+                    If not listed, type "Suica" here ☝️
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="step-section">
+        <div class="step-header" style="border-left-color: #00C03A;">
+            <h2>Step 3: Add & Load Money</h2>
+            <p>Confirm card type and add initial balance.</p>
+        </div>
+        <div class="visual-area">
+            <div class="phone-mockup">
+                <img src="Suica_4.PNG" alt="Intro">
+                <div class="click-target" style="top: 86%; left: 50%; width: 90%; height: 50px; border-radius: 30px; border-color:#00C03A; box-shadow: 0 0 15px rgba(0, 192, 58, 0.6);"></div>
+            </div>
+            <div class="phone-mockup">
+                <img src="Suica_5.PNG" alt="Input Amount">
+                <div class="click-target" style="top: 40%; left: 50%; width: 60%; height: 80px; border-radius: 10px; border-color:#00C03A; box-shadow: 0 0 15px rgba(0, 192, 58, 0.6);"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="step-section">
+        <div class="step-header" style="border-left-color: #00C03A;">
+            <h2>Step 4: Agree & Pay</h2>
+            <p>Finalize the process with Apple Pay.</p>
+        </div>
+        <div class="visual-area">
+            <div class="phone-mockup">
+                <img src="Suica_6.PNG" alt="Terms">
+                <div class="click-target" style="top: 93%; left: 90%; width: 60px; height: 40px; border-radius: 10px; border-color:#00C03A; box-shadow: 0 0 15px rgba(0, 192, 58, 0.6);"></div>
+            </div>
+            <div class="phone-mockup">
+                <img src="Suica_7.JPG" alt="Apple Pay">
+                <div style="position:absolute; top:30%; right:-20px; width:40px; height:100px; border-left: 4px solid #00C03A; border-radius: 5px;"></div>
+                <div style="position:absolute; top:35%; right:-140px; color:#00C03A; font-weight:bold;">Double Click <br> Side Button</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="step-section suica-step" style="border-left-color: #00C03A;">
+        <div class="step-header" style="border-left-color: #00C03A;">
+            <h2>Step 5: Tap & Go!</h2>
+            <p style="color: #666;">The magic of Express Transit mode.</p>
+        </div>
+        
+        <div class="visual-area">
+            <div class="phone-mockup" style="border-color: #444;">
+                <div style="width:100%; height:100%; background:#000; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#fff; position: relative;">
+                    <div style="position: absolute; width:100%; height:2px; background:#00C03A; box-shadow:0 0 20px #00C03A; animation: scan 1.5s infinite; z-index: 5;"></div>
+                    <div style="font-size:4rem; margin-bottom: 20px;">📱⚡</div>
+                    <h3 style="margin:0; color:white; letter-spacing: 1px;">Locked Screen</h3>
+                    <p style="color:#888; font-size: 0.9rem; margin-top: 10px;">(Do not open any app)</p>
+                </div>
+            </div>
+            
+            <div class="text-area">
+                <h3 style="color:#00C03A;">No FaceID Needed</h3>
+                <p>Because it's set as an "Express Transit Card", you <strong>do NOT</strong> need to wake up your phone, open the app, or use FaceID.</p>
+                <p>Just hover the top-part of your iPhone over the gate reader, even if the screen is black!</p>
+                
+                <div style="background:rgba(0, 192, 58, 0.1); padding:15px; border-radius:8px; margin-top:20px; border:1px solid #00C03A; color:#2c3e50;">
+                    🛍️ <strong>Bonus:</strong> You can also use this at 7-Eleven, Lawson, and Vending Machines. Just say "Suica" to the cashier.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin: 100px 0 60px 0; border-top: 1px solid #eee; padding-top: 60px;"></div>
+
+    <footer style="text-align:center; padding: 60px 20px; color: #888; border-top: 1px solid #eee; margin-top: 60px;">
+        <p>© 2026 Travel Guide. Created based on personal experience.</p>
+        <p style="font-size: 0.9rem;">Disclaimer: App interfaces may change over time.</p>
+    </footer>
+
+</div> 
+</body>
+</html>
