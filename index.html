@@ -38,22 +38,41 @@
             margin: 0 auto;
         }
 
-        /* --- 顶部导航栏 (方案一：动态下划线) --- */
-        .top-nav a {
-            text-decoration: none;
-            color: #57606f;
-            margin-left: 30px;
-            font-weight: 500;
-            font-size: 1rem;
-            transition: color 0.3s ease;
-            position: relative;
-            padding-bottom: 5px;
+        /* --- 顶部导航栏 (修复版：固定+磨砂效果) --- */
+        .top-nav {
+            display: flex;
+            justify-content: flex-end; 
+            align-items: center;
+            position: sticky;      
+            top: 0;                
+            z-index: 1000;         
+            
+            /* 磨砂玻璃背景 */
+            background: rgba(245, 247, 250, 0.85); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px); 
+            
+            /* 视觉微调 */
+            border-bottom: 1px solid rgba(0,0,0,0.05); 
+            margin: -40px -20px 40px -20px; 
+            padding: 15px 40px;    
+        }
+            /* --- 顶部导航栏 (方案一：动态下划线) --- */
+            .top-nav a {
+              text-decoration: none;
+              color: #57606f;
+              margin-left: 30px;
+              font-weight: 500;
+              font-size: 1rem;
+              transition: color 0.3s ease;
+              position: relative;
+              padding-bottom: 5px;
         }
 
         /* 鼠标悬停时的文字颜色 */
        .top-nav a:hover {
-           color: var(--accent-blue); 
-         }
+           color: var(--accent-blue);
+       }
 
         /* 创建下划线 */
        .top-nav a::after {
@@ -65,7 +84,7 @@
           left: 50%; /* 从中间开始 */
           background-color: var(--accent-blue);
           transition: all 0.3s ease-in-out;
-         transform: translateX(-50%); /* 修正中心点 */
+          transform: translateX(-50%); /* 修正中心点 */
          }
 
         /* 鼠标悬停时，下划线展开 */
@@ -90,6 +109,22 @@
             margin-bottom: 10px;
         }
 
+        /* --- 9. Part 1: 首页导航封面 (电脑端大标题优化修改处) --- */
+        .hero-section {
+            text-align: center;
+            padding: 60px 20px 40px;
+            margin-bottom: 40px;
+        }
+        
+        .hero-title {
+            font-size: 4.5rem;      /* 保持 4.5rem 巨大字体 */
+            margin-bottom: 10px;
+            letter-spacing: -2px; /* 👈 优化：字变大了，间距要收紧一点才精致 */
+            font-weight: 700;
+            line-height: 1.1;     /* 👈 优化：防止行高太高显得松散 */
+        }
+
+        html { scroll-behavior: smooth; }
         h1 { margin: 0 0 15px 0; font-size: 2.5rem; line-height: 1.2; }
         
         .subtitle { 
@@ -107,15 +142,15 @@
             margin-bottom: 60px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.05);
             /* 确保边框不会溢出 */
-            width: 100%; 
+            width: 100%;
             transition: transform 0.3s ease, box-shadow 0.3s ease; /* 增加过渡动画 */
         }
         .step-section:hover {
           /* 微微上浮 2px，不要太多，否则会晕 */
-          transform: translateY(-2px); 
+          transform: translateY(-2px);
           /* 阴影变得更深、更虚，营造悬浮感 */
-          box-shadow: 0 20px 40px rgba(0,0,0,0.08); 
-}
+          box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        }
 
         .didi-step .step-header { border-left-color: var(--accent-orange); }
         .metro-step .step-header { border-left-color: var(--accent-blue); }
@@ -351,39 +386,45 @@
             .gallery-grid { column-count: 2; }
         }
 
+        /* --- 8. 响应式适配 (手机端设置) --- */
         @media (max-width: 600px) {
             .gallery-grid { column-count: 1; }
             .step-section { padding: 30px 20px; }
-            
-            /* 优化点：限制移动端样机宽度，防止过大 */
+    
             :root { 
-                --mockup-width: 280px; 
+                --mockup-width: 280px;
                 --mockup-height: auto; 
                 aspect-ratio: 9/18;
             }
-            
+       
+            /* 确保这里有一行限制手机端标题大小的代码 */
+            .hero-title { font-size: 2.2rem; }
+    
             .visual-area { flex-direction: column; align-items: center; }
             .top-nav { justify-content: center; } 
+            h1 { font-size: 1.8rem; }
+
+            /* --- ✨ 新增修复代码开始 ✨ --- */
+            
+            /* 1. 强制给 Step 5 的手机框一个固定高度 */
+            .step5-mockup {
+                height: 400px !important; /* 强制设定高度为 400px */
+                aspect-ratio: auto !important; /* 取消比例限制 */
+            }
+
+            /* 2. 修正蓝圈圈的位置 */
+            .step5-fix {
+                top: auto !important; /* 取消顶部定位 */
+                bottom: 25px !important; /* 固定在底部 */
+            }
+            
+            /* --- ✨ 新增修复代码结束 ✨ --- */
             
             /* 优化点：减小移动端标题字号 */
             h1 { font-size: 1.8rem; }
             .hero-title { font-size: 2rem; }
         }
         
-        /* --- 9. Part 1: 首页导航封面 --- */
-        .hero-section {
-            text-align: center;
-            padding: 60px 20px 40px;
-            margin-bottom: 40px;
-        }
-        
-        .hero-title {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            letter-spacing: -1px;
-        }
-
-        html { scroll-behavior: smooth; }
 
         /* --- 10. 表格样式优化 --- */
         .suica-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.95rem; min-width: 500px; /* 确保表格不被挤压 */ }
@@ -578,7 +619,7 @@
         </div>
         
         <div class="visual-area">
-            <div class="phone-mockup">
+            <div class="phone-mockup step5-mockup">
                 <div class="css-drawing-container">
                     <div class="mock-map">
                         <div class="car-icon">🚖</div>
@@ -600,7 +641,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="click-target" style="top: 80%; left: 50%; width: 90%; height: 70px; border-radius: 10px;"></div>
+                <div class="click-target step5-fix" style="top: 80%; left: 50%; width: 90%; height: 70px; border-radius: 10px;"></div>
             </div>
             
             <div class="text-area">
@@ -620,7 +661,6 @@
                 </div>
             </div>
         </div>
-    </div>
 
     <div style="margin: 100px 0 0 0; border-top: 1px solid #eee;"></div>
 
@@ -846,7 +886,7 @@
             <h2>Step 5: Tap & Go!</h2>
             <p style="color: #666;">The magic of Express Transit mode.</p>
         </div>
-        
+       
         <div class="visual-area">
             <div class="phone-mockup" style="border-color: #444;">
                 <div style="width:100%; height:100%; background:#000; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#fff; position: relative;">
@@ -869,7 +909,6 @@
         </div>
     </div>
     
-    <div style="margin: 100px 0 60px 0; border-top: 1px solid #eee; padding-top: 60px;"></div>
 
     <footer style="text-align:center; padding: 60px 20px; color: #888; border-top: 1px solid #eee; margin-top: 60px;">
         <p>© 2026 Travel Guide. Created based on personal experience.</p>
